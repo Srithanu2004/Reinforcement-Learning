@@ -1,0 +1,65 @@
+import numpy as np
+import random
+
+def create_environment(rows, cols, blocked_prob=0.2):
+    # Create a random environment with blocked cells
+    environment = np.random.choice([0, 1], size=(rows, cols), p=[1 - blocked_prob, blocked_prob])
+    environment[0, 0] = 0  # Start point
+    environment[rows - 1, cols - 1] = 0  # End point
+    return environment
+
+def explore(matrix, explore_prob=0.1):
+    # Introduce exploration by randomly selecting whether to explore or exploit
+    return np.where(np.random.rand(*matrix.shape) < explore_prob, 1, matrix)
+
+def find_path(matrix):
+    # Basic algorithm (e.g., A* without exploration)
+    rows, cols = matrix.shape
+    path = [(0, 0)]
+    current_position = (0, 0)
+
+    while current_position != (rows - 1, cols - 1):
+        neighbors = []
+
+        # Check adjacent cells
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if 0 <= current_position[0] + i < rows and 0 <= current_position[1] + j < cols:
+                    neighbors.append((current_position[0] + i, current_position[1] + j))
+
+        # Choose the next cell with the minimum value
+        next_cell = min(neighbors, key=lambda x: matrix[x[0], x[1]])
+
+        # Move to the next cell
+        current_position = next_cell
+        path.append(current_position)
+
+    return path
+
+# Parameters
+rows, cols = 6, 5
+blocked_prob = 0.2
+explore_prob = 0.1
+
+# Create environment
+environment = create_environment(rows, cols, blocked_prob)
+
+# Introduce exploration mechanism
+explored_environment = explore(environment, explore_prob)
+
+# Find path without exploration
+path_without_exploration = find_path(environment.copy())
+
+# Find path with exploration
+path_with_exploration = find_path(explored_environment.copy())
+
+# Print results
+print("Environment without exploration:")
+print(environment)
+print("\nPath without exploration:")
+print(path_without_exploration)
+
+print("\n\nEnvironment with exploration:")
+print(explored_environment)
+print("\nPath with exploration:")
+print(path_with_exploration)
